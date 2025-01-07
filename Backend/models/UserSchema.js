@@ -15,14 +15,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false, // Not required for login, but for signup
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'], // Define acceptable roles
+    default: 'user',
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-const UserModel = mongoose.model('User', userSchema, 'users'); // Maps to 'users' collection
-const AdminModel = mongoose.model('Admin', userSchema, 'admins'); // Maps to 'admins' collection
+// Models for separate collections
+const UserModel = mongoose.model('User', userSchema, 'users');
+const AdminModel = mongoose.model('Admin', userSchema, 'admins');
 
-// Export both models as an object
 module.exports = { UserModel, AdminModel };

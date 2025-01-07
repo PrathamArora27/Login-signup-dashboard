@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,13 +21,19 @@ export const Login = () => {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),  // Sending the formData object as the body
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
       if (response.ok) {
         console.log('Login Successful:', result);
-        // Handle successful login (e.g., store JWT token or navigate)
+
+        // Navigate based on role
+        if (result.role === 'admin') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/user-dashboard');
+        }
       } else {
         setError(result.error || 'Login failed');
       }
@@ -48,7 +55,7 @@ export const Login = () => {
           <input
             type="email"
             id="email"
-            name="email"  // Bind input to formData.email
+            name="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
@@ -63,7 +70,7 @@ export const Login = () => {
           <input
             type="password"
             id="password"
-            name="password"  // Bind input to formData.password
+            name="password"
             value={formData.password}
             onChange={handleChange}
             placeholder="Enter your password"

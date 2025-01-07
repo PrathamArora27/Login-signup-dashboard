@@ -37,7 +37,7 @@ const server = http.createServer(async (req, res) => {
 
       if (parsedUrl.pathname === '/signup') {
         try {
-          const { email, password } = data;
+          const { email, password, role } = data;
 
           // Check if user already exists
           const existingUser = await UserModel.findOne({ email });
@@ -48,11 +48,11 @@ const server = http.createServer(async (req, res) => {
           }
 
           // Create new user
-          const newUser = new UserModel({ email, password });
+          const newUser = new AdminModel({ email, password, role });
           await newUser.save();
 
           res.writeHead(201, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ message: 'Signup successful' }));
+          res.end(JSON.stringify({ message: 'Signup successful', role: role }));
         } catch (err) {
           console.error('Error during signup:', err);
           res.writeHead(500, { 'Content-Type': 'application/json' });
