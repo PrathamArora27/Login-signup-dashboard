@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  username: {
+  name: {
     type: String,
     required: false, // Not required for login, but for signup
   },

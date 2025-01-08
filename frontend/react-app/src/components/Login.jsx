@@ -30,9 +30,9 @@ export const Login = () => {
 
         // Navigate based on role
         if (result.role === 'admin') {
-          navigate('/admin-dashboard');
+          navigate('/admin-dashboard', { state: { name: result.name } }); // Pass name here
         } else {
-          navigate('/user-dashboard');
+          navigate('/user-dashboard', { state: { name: result.name  } }); // Pass name here
         }
       } else {
         setError(result.error || 'Login failed');
@@ -44,14 +44,12 @@ export const Login = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', borderRadius: '8px' }}>
+    <div className="login-container">
       <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>
-            Email:
-          </label>
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
           <input
             type="email"
             id="email"
@@ -59,14 +57,11 @@ export const Login = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '5px' }}>
-            Password:
-          </label>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
@@ -74,16 +69,10 @@ export const Login = () => {
             value={formData.password}
             onChange={handleChange}
             placeholder="Enter your password"
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
         </div>
 
-        <button
-          type="submit"
-          style={{ width: '100%', padding: '10px', borderRadius: '4px', background: 'blue', color: 'white', border: 'none' }}
-        >
-          Login
-        </button>
+        <button type="submit">Login</button>
       </form>
     </div>
   );

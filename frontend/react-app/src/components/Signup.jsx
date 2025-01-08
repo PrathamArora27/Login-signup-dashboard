@@ -39,9 +39,9 @@ export const Signup = () => {
         });
         setError('');
         if (result.role === 'admin') {
-          navigate('/admin-dashboard');
+          navigate('/admin-dashboard', { state: { name: formData.name } }); // Pass name here
         } else {
-          navigate('/user-dashboard');
+          navigate('/user-dashboard', { state: { name: formData.name  } }); // Pass name here
         }
       } else {
         setError(result.error || 'Signup failed');
@@ -53,15 +53,13 @@ export const Signup = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', borderRadius: '8px' }}>
+    <div>
       <h2>Signup</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+      {error && <p>{error}</p>}
+      {success && <p>{success}</p>}
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="name" style={{ display: 'block', marginBottom: '5px' }}>
-            Name:
-          </label>
+        <div>
+          <label htmlFor="name">Name:</label>
           <input
             type="text"
             id="name"
@@ -69,14 +67,11 @@ export const Signup = () => {
             value={formData.name}
             onChange={handleChange}
             placeholder="Enter your name"
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>
-            Email:
-          </label>
+        <div>
+          <label htmlFor="email">Email:</label>
           <input
             type="email"
             id="email"
@@ -84,14 +79,11 @@ export const Signup = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '5px' }}>
-            Password:
-          </label>
+        <div>
+          <label htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
@@ -99,32 +91,23 @@ export const Signup = () => {
             value={formData.password}
             onChange={handleChange}
             placeholder="Enter your password"
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="role" style={{ display: 'block', marginBottom: '5px' }}>
-            Role:
-          </label>
+        <div>
+          <label htmlFor="role">Role:</label>
           <select
             id="role"
             name="role"
             value={formData.role}
             onChange={handleChange}
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
           >
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
         </div>
 
-        <button
-          type="submit"
-          style={{ width: '100%', padding: '10px', borderRadius: '4px', background: 'green', color: 'white', border: 'none' }}
-        >
-          Signup
-        </button>
+        <button type="submit">Signup</button>
       </form>
     </div>
   );

@@ -37,47 +37,80 @@ const server = http.createServer(async (req, res) => {
 
       if (parsedUrl.pathname === '/signup') {
         try {
-          const { email, password, role } = data;
-
-          // Check if user already exists
-          const existingUser = await UserModel.findOne({ email });
+          const { email, password, role, name } = data;
+      
+          // Input validation
+          if (!email || !password || !['admin', 'user'].includes(role)) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid input' }));
+            return;
+          }
+      
+          const model = role === 'admin' ? AdminModel : UserModel;
+      
+          // Check if email exists
+          const existingUser = await model.findOne({ email });
           if (existingUser) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Email already in use' }));
             return;
           }
-
+      
+          // Hash the password
+          const bcrypt = require('bcrypt');
+          const hashedPassword = await bcrypt.hash(password, 10);
+      
           // Create new user
-          const newUser = new AdminModel({ email, password, role });
+          const newUser = new model({ name,email, password: hashedPassword, role });
           await newUser.save();
-
+      
           res.writeHead(201, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ message: 'Signup successful', role: role }));
+          res.end(JSON.stringify({ message: 'Signup successful', role }));
         } catch (err) {
           console.error('Error during signup:', err);
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Internal Server Error' }));
         }
-      } else if (parsedUrl.pathname === '/login') {
+      }
+      else if (parsedUrl.pathname === '/login') {
         try {
-          const { email, password } = data;
-
-          // Check if user exists and password matches
-          const user = await UserModel.findOne({ email });
-          if (!user || user.password !== password) {
-            res.writeHead(401, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Invalid email or password' }));
-            return;
-          }
-
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ message: 'Login successful' }));
+            const { email, password } = data;
+    
+            // Check if user exists in UserModel
+            let user = await UserModel.findOne({ email });
+    
+            // If not found in UserModel, check in AdminModel
+            if (!user) {
+                user = await AdminModel.findOne({ email });
+            }
+    
+            // If no user is found in both collections
+            if (!user) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid email or password' }));
+                return;
+            }
+    
+            // Check password
+            const bcrypt = require('bcrypt');
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+            if (!isPasswordValid) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid email or password' }));
+                return;
+            }
+    
+            // Successful login
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Login successful', role: user.role, name: user.name }));
         } catch (err) {
-          console.error('Error during login:', err);
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            console.error('Error during login:', err);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
         }
-      } else {
+    }
+     else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Endpoint not found' }));
       }
